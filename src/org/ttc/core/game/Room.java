@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.ttc.client.Help;
 
 /**
  *
@@ -27,6 +28,7 @@ public class Room {
     public static Image grass;
     public int player;
     int serialnumber;
+    int victoryStatus = 0;
 
     public Unit[] units() {
         Unit[] u = new Unit[units.size()];
@@ -84,7 +86,7 @@ public class Room {
         this.players[8].color = new Color(128, 128, 128);
         for (int i = 0; i < 8; i++) {
             bases[i] = new Base(this, (int) (cos((float) i / 4 * Math.PI) * 1000), (int) (sin((float) i / 4 * Math.PI) * 1000), this.players[i / (8 / players)]);
-            bases[i + 8] = new Base(this, (int) (cos((float) i / 4 * Math.PI + (Math.PI / 8)) * 500), (int) (sin((float) i / 4 * Math.PI + (Math.PI / 8)) * 500), this.players[i / (8 / players)]);
+            bases[i + 8] = new Base(this, (int) (cos((float) i / 4 * Math.PI + (Math.PI / 8)) * 550), (int) (sin((float) i / 4 * Math.PI + (Math.PI / 8)) * 550), this.players[i / (8 / players)]);
         }
         bases[16] = new Base(this, (int) (0), (int) (0), this.players[8]);
         for (int i = 0; i < 17; i++) {
@@ -92,8 +94,8 @@ public class Room {
                 Unit unit = new Unit(this, 0, 0, bases[i]);
                 units.add(unit);
                 if (j == 0) {
-                    unit.base.owner.camerax = (int) (unit.x - 400);
-                    unit.base.owner.cameray = (int) (unit.y - 300);
+                    unit.base.owner.camerax = (int) (unit.x);
+                    unit.base.owner.cameray = (int) (unit.y);
                 }
             }
         }
@@ -102,9 +104,18 @@ public class Room {
     public Timer t = new Timer(15, new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
-
+            int playerBases = 0;
             for (Base base : bases) {
                 base.tick();
+                if(base.owner == players[player]){
+                    playerBases++;
+                }
+            }
+            if(playerBases == 0){
+                victoryStatus = 2;
+            }
+            if(playerBases == 17){
+                victoryStatus = 1;
             }
             for (Unit unit : units()) {
                 unit.tick();
@@ -162,8 +173,16 @@ public class Room {
                 players[player].cameray += 5;
             }
         }
-        int cx = players[player].camerax;
-        int cy = players[player].cameray;
+        {
+            double dist = Math.sqrt(Math.pow(players[player].camerax, 2) + Math.pow(players[player].cameray, 2));
+            if (dist > 1000) {
+                double a = Math.atan2(-players[player].cameray, -players[player].camerax);
+                players[player].camerax += (dist - 1000) * Math.cos(a);
+                players[player].cameray += (dist - 1000) * Math.sin(a);
+            }
+        }
+        int cx = players[player].camerax - Display.getWidth() / 2;
+        int cy = players[player].cameray - Display.getHeight() / 2;
 
         try {
 
@@ -184,8 +203,8 @@ public class Room {
             if (!Mouse.isButtonDown(0)) {
                 selected.clear();
             }
-            int mx = players[player].camerax + Mouse.getX();
-            int my = players[player].cameray + Display.getHeight() - Mouse.getY();
+            int mx = cx + Mouse.getX();
+            int my = cy + Display.getHeight() - Mouse.getY();
             if (t.isRunning()) {
                 if (Mouse.getX() < 25) {
                     players[player].camerax -= 5;
@@ -250,7 +269,16 @@ public class Room {
         }
         modeSwitch = (modeSwitch * 10 + 170 + players[player].mode * 80) / 11;
         Unit.iconImage[5].draw(80, (int) modeSwitch, 70, 70);
-
+        Help.render(g);
+        Unit.victory_back.setImageColor(players[player].color.r, players[player].color.g, players[player].color.b, 1);
+        if (victoryStatus == 1) {
+            Unit.victory_back.draw((Display.getWidth() - Unit.victory_back.getWidth()) / 2, (Display.getHeight() - Unit.victory_back.getHeight()) / 2);
+            Unit.victory.draw((Display.getWidth() - Unit.victory.getWidth()) / 2, (Display.getHeight() - Unit.victory.getHeight()) / 2);
+        }
+        if (victoryStatus == 2) {
+            Unit.victory_back.draw((Display.getWidth() - Unit.victory_back.getWidth()) / 2, (Display.getHeight() - Unit.victory_back.getHeight()) / 2);
+            Unit.fail.draw((Display.getWidth() - Unit.fail.getWidth()) / 2, (Display.getHeight() - Unit.fail.getHeight()) / 2);
+        }
     }
     double modeSwitch = 170;
 }

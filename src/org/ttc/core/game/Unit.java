@@ -54,9 +54,10 @@ public class Unit implements Serializable, Cloneable {
     static public int reloadTime = 35, reloadAmmoTime = 100, ammoSize = 10, damage = 150, maxHp = 1000, size = 64;
     static public Bullet bulletPrototype;
     static public Image bodyImage, iconImage[], headImage[], head2Image[], baseImage, baseColor, explosion[];
-    static public Image rainbow, basePicture, tankPicture;
+    static public Image rainbow, basePicture, tankPicture, victory_back, victory, fail;
 
     static Random r = new Random();
+
 
     static public void initGraphics() {
         try {
@@ -85,6 +86,10 @@ public class Unit implements Serializable, Cloneable {
 
             baseImage = new Image("textures/base.png");
             baseColor = new Image("textures/base_color.png");
+            
+            victory_back = new Image("textures/icons/victory_back.png");
+            victory = new Image("textures/icons/victory.png");
+            fail = new Image("textures/icons/fail.png");
 
             explosion = new Image[10];
             for (int i = 1; i <= 10; i++) {
@@ -131,33 +136,31 @@ public class Unit implements Serializable, Cloneable {
     }
 
     public void ai() {
-        if (r.nextInt(100) == 0) {
-            if (ai == 0) {
-                double dist = 5000;
-                Base base = null;
-                for (Base b : room.bases) {
-                    if (b.owner == owner) {
-                        continue;
-                    }
-                    double d = sqrt(pow(b.x - x, 2) + pow(b.y - y, 2));
-                    if (d < dist) {
-                        base = b;
-                        dist = d;
-                    }
+        if (ai == 0) {
+            double dist = 5000;
+            Base base = null;
+            for (Base b : room.bases) {
+                if (b.owner == owner) {
+                    continue;
                 }
-                if (base != null) {
-                    tx = base.x;
-                    ty = base.y;
+                double d = sqrt(pow(b.x - x, 2) + pow(b.y - y, 2));
+                if (d < dist) {
+                    base = b;
+                    dist = d;
                 }
-            } else {
-                for (Unit unit : room.units()) {
-                    double d = sqrt(pow(unit.x - x, 2) + pow(unit.y - y, 2));
-                    if ((target == null || d < td) & unit.hp > 0 && unit.owner != owner) {
-                        target = unit;
-                        tx = unit.x;
-                        ty = unit.y;
-                        td = d;
-                    }
+            }
+            if (base != null) {
+                tx = base.x;
+                ty = base.y;
+            }
+        } else {
+            for (Unit unit : room.units()) {
+                double d = sqrt(pow(unit.x - x, 2) + pow(unit.y - y, 2));
+                if ((target == null || d < td) & unit.hp > 0 && unit.owner != owner) {
+                    target = unit;
+                    tx = unit.x;
+                    ty = unit.y;
+                    td = d;
                 }
             }
         }
@@ -255,20 +258,12 @@ public class Unit implements Serializable, Cloneable {
         }
         if (ha == hta && target != null) {
             if (reload == 0) {
-                switch (type) {
-                    case (0):
-                        room.bullets.add(new Shell(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));
-                        break;
-                    case (1):
-                        room.bullets.add(new Acid(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));
-                        break;
-                    case (2):
-                        room.bullets.add(new Rainbow(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));
-                        break;
-                    case (3):
-                        room.bullets.add(new Plazma(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));
-                        break;
-
+                switch(type){
+                    case(0):room.bullets.add(new Shell(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));break;
+                    case(1):room.bullets.add(new Acid(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));break;
+                    case(2):room.bullets.add(new Rainbow(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));break;
+                    case(3):room.bullets.add(new Plasma(x, y, cos(ha) * 10, sin(ha) * 10, owner, room));break;
+                    
                 }
                 reload = reloadTime;
             }

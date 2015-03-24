@@ -24,9 +24,6 @@ public class Player implements Serializable {
     public int mode = 0;
 
     public int type() {
-        if (Unit.r.nextInt(10)==0){
-            mode = Unit.r.nextInt(5);
-        }
         if (mode == 0) {
             return Unit.r.nextInt(4);
         }else{

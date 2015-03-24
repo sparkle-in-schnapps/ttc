@@ -16,9 +16,9 @@ import static org.ttc.core.game.Unit.size;
  *
  * @author Whizzpered
  */
-public class Plazma extends Bullet{
+public class Plasma extends Bullet{
     
-    public Plazma(double x, double y, double dx, double dy, Player target, Room room){
+    public Plasma(double x, double y, double dx, double dy, Player target, Room room){
         super(x,y,dx,dy,target,room);
     }
     
