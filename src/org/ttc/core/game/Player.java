@@ -14,7 +14,6 @@ public class Player implements Serializable {
 
     public Player(String name, int color) {
         this.name = name;
-        this.color = new Color(color);
         this.camerax = 0;
         this.cameray = 0;
     }

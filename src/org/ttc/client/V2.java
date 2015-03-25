@@ -55,7 +55,7 @@ public class V2 {
 
     public static int display_width, display_height;
     static Room room;
-    static FontRender fontRender;
+    public static FontRender fontRender;
     static Image gui[] = new Image[5];
     static ClientConnection cc;
     static boolean changeColor, waiting;
@@ -67,6 +67,7 @@ public class V2 {
         conf.set("h", Display.getHeight());
         conf.set("x", Display.getX());
         conf.set("y", Display.getY());
+        conf.set("help", Help.slide);
         try {
             Writer.writeToFile(conf, cfg);
         } catch (FileNotFoundException ex) {
@@ -94,6 +95,7 @@ public class V2 {
                         h = conf.get("h").getValueAsInteger();
                         x = conf.get("x").getValueAsInteger();
                         y = conf.get("y").getValueAsInteger();
+                        Help.slide = conf.get("help").getValueAsInteger();
                         currentLocale = conf.get("locale").getValueAsInteger(); 
                     } else {
                         conf.set("music", true);
@@ -168,18 +170,18 @@ public class V2 {
                             Random rand = new Random();
                             room = new Room(4);
                             room.player = 0;
-                            for (int i = 0; i < 4; i++) {
+                            for (int i = 1; i < 4; i++) {
                                 room.players[i].name = "AI";
-                                room.players[i].color = new Color(rand.nextInt());
                                 room.players[i].ai = true;
                             }
                             room.players[0].ai = false;
                             room.players[0].color = Color.decode(conf.get("color").getValueAsString());
+                            room.setColors();
                         }
 
                     });
 
-                    buttons.add(new Button(0, 370, 400, "multi", new Color(0, 155, 255)) {
+                    buttons.add(new Button(0, 370, 400, "multi", new Color(155, 155, 155)) {
 
                         @Override
                         public void click() {
@@ -322,7 +324,7 @@ public class V2 {
                                     Room.grass.draw(x * 128, y * 128);
                                 }
                             }
-                            fontRender.drawString("0.7.2 alpha", 95, 25, Color.white);
+                            fontRender.drawString("0.8 alpha", 95, 25, Color.white);
                             fontRender.drawString("Yew_Mentzaki", 25, 60, Color.white);
                             fontRender.drawString("Whizzpered", 25, 85, Color.white);
                             fontRender.drawString("Steve Combs", 25, 110, Color.white);

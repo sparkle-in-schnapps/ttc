@@ -14,6 +14,8 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.ttc.client.Help;
+import static org.ttc.client.Help.border;
+import org.ttc.client.V2;
 
 /**
  *
@@ -78,12 +80,50 @@ public class Room {
 
     }
 
+    public void setColors() {
+        String colorExamples[] = new String[]{
+            "#ff0034",
+            "#ee9900",
+            "#f6ef00",
+            "#4cbb17",
+            "#33cbff",
+            "#0000ff",
+            "#ff5daf",
+            "#904602",
+            "#CD00CD",
+            "#00A85F",
+        };
+
+        for (int i = 1; i < players.length; i++) {
+            if (players[i] == null) {
+                continue;
+            }
+            players[i].color = Color.decode(colorExamples[Unit.r.nextInt(10)]);
+            while (ic(i)) {
+                players[i].color = Color.decode(colorExamples[Unit.r.nextInt(10)]);
+            }
+        }
+        this.players[8].color = new Color(128, 128, 128);
+    }
+
+    private boolean ic(int i) {
+        for (int j = 0; j < players.length; j++) {
+            if (i == j || players[j] == null) {
+                continue;
+            }
+            if (players[j].color.r == players[i].color.r && players[j].color.g == players[i].color.g && players[j].color.b == players[i].color.b) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Room(int players) {
         for (int i = 0; i < players; i++) {
             this.players[i] = new Player("none", 0);
         }
         this.players[8] = new Player("neutral", 0);
-        this.players[8].color = new Color(128, 128, 128);
+
         for (int i = 0; i < 8; i++) {
             bases[i] = new Base(this, (int) (cos((float) i / 4 * Math.PI) * 1000), (int) (sin((float) i / 4 * Math.PI) * 1000), this.players[i / (8 / players)]);
             bases[i + 8] = new Base(this, (int) (cos((float) i / 4 * Math.PI + (Math.PI / 8)) * 550), (int) (sin((float) i / 4 * Math.PI + (Math.PI / 8)) * 550), this.players[i / (8 / players)]);
@@ -107,14 +147,14 @@ public class Room {
             int playerBases = 0;
             for (Base base : bases) {
                 base.tick();
-                if(base.owner == players[player]){
+                if (base.owner == players[player]) {
                     playerBases++;
                 }
             }
-            if(playerBases == 0){
+            if (playerBases == 0) {
                 victoryStatus = 2;
             }
-            if(playerBases == 17){
+            if (playerBases == 17) {
                 victoryStatus = 1;
             }
             for (Unit unit : units()) {
@@ -274,10 +314,18 @@ public class Room {
         if (victoryStatus == 1) {
             Unit.victory_back.draw((Display.getWidth() - Unit.victory_back.getWidth()) / 2, (Display.getHeight() - Unit.victory_back.getHeight()) / 2);
             Unit.victory.draw((Display.getWidth() - Unit.victory.getWidth()) / 2, (Display.getHeight() - Unit.victory.getHeight()) / 2);
+            border.draw(0, Display.getHeight() - 20, Display.getWidth(), 20);
+            V2.fontRender.drawString(V2.localeText("space"), Display.getWidth() - V2.fontRender.getWidth(V2.localeText("space")) - 50, Display.getHeight() - 40, Color.white);
         }
         if (victoryStatus == 2) {
             Unit.victory_back.draw((Display.getWidth() - Unit.victory_back.getWidth()) / 2, (Display.getHeight() - Unit.victory_back.getHeight()) / 2);
             Unit.fail.draw((Display.getWidth() - Unit.fail.getWidth()) / 2, (Display.getHeight() - Unit.fail.getHeight()) / 2);
+            border.draw(0, Display.getHeight() - 20, Display.getWidth(), 20);
+            V2.fontRender.drawString(V2.localeText("space"), Display.getWidth() - V2.fontRender.getWidth(V2.localeText("space")) - 50, Display.getHeight() - 40, Color.white);
+        }
+        if (victoryStatus > 0 && Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+            t.stop();
+            Help.space = false;
         }
     }
     double modeSwitch = 170;

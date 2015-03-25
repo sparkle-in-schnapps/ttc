@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Help {
 
     private static Image exmaples[] = new Image[4];
-    private static Image tank, border;
+    public static Image tank, border;
 
     public static void load() {
         try {
@@ -30,7 +30,7 @@ public class Help {
         }
     }
     static int slide = 1;
-    static boolean space = false;
+    public static boolean space = false;
 
     public static void render(Graphics g) {
         if(space&&!Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
